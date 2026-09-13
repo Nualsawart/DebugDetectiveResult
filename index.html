@@ -15,7 +15,7 @@ h1{margin:0 0 8px;font-size:32px}.sub{color:#6d788c}
 .pill{display:inline-block;padding:8px 14px;border-radius:999px;background:#fff0a8;font-weight:bold}
 input,select,textarea{width:100%;padding:13px;margin:6px 0 14px;border:2px solid #e0e6ef;border-radius:13px;font-size:16px;background:white}
 button{border:0;border-radius:14px;padding:13px 20px;font-size:16px;font-weight:bold;cursor:pointer}
-.primary{background:#718cff;color:#fff}.secondary{background:#edf1f7;color:#34405a}
+.primary{background:#718cff;color:#fff}.primary:disabled{opacity:.55;cursor:not-allowed}.secondary{background:#edf1f7;color:#34405a}
 .hide{display:none}.score{font-size:20px;font-weight:bold}
 .bar{height:11px;background:#e8edf5;border-radius:20px;overflow:hidden;margin:16px 0}
 .fill{height:100%;background:#718cff;width:0;transition:.3s}
@@ -139,7 +139,7 @@ const levels=[
 }
 ];
 
-let current=0, score=0, bugFound=false, selectedReason=-1;
+let current=0, score=0, bugFound=false, selectedReason=-1, levelSubmitting=false, bugChecking=false;
 
 const $=id=>document.getElementById(id);
 
@@ -182,6 +182,10 @@ function loadLevel(){
  $("fixFeedback").innerHTML="";
  bugFound=false;
  selectedReason=-1;
+ levelSubmitting=false;
+ bugChecking=false;
+ $("checkBugBtn").disabled=false;
+ $("submitBtn").disabled=false;
 }
 
 function selectBug(btn){
@@ -196,8 +200,12 @@ function selectReason(btn){
 }
 
 function checkBug(){
+ if(bugChecking || bugFound)return;
  const selected=document.querySelector("#bugChoices .choice.sel");
  if(!selected){alert("เลือกบรรทัดที่คิดว่าผิดก่อน");return;}
+ bugChecking=true;
+ $("checkBugBtn").disabled=true;
+
  if(Number(selected.dataset.i)===levels[current].bug){
    score+=10;
    $("score").textContent=score;
@@ -206,30 +214,37 @@ function checkBug(){
    $("fixArea").classList.remove("hide");
  }else{
    $("bugFeedback").innerHTML='<div class="feedback no">ยังไม่ใช่ ลองอ่านโค้ดทีละบรรทัดอีกครั้ง</div>';
+   $("checkBugBtn").disabled=false;
+   bugChecking=false;
  }
 }
-
 function submitLevel(){
- if(!bugFound)return;
+ if(levelSubmitting || !bugFound)return;
  const typed=$("fixCode").value.trim();
- if(!typed){$("fixFeedback").innerHTML='<div class="feedback no">ลองแก้โค้ดก่อน แล้วจึงส่งคำตอบ</div>';return;}
+ if(!typed){
+   $("fixFeedback").innerHTML='<div class="feedback no">ลองแก้โค้ดก่อน แล้วจึงส่งคำตอบ</div>';
+   return;
+ }
  if(selectedReason<0){alert("เลือกเหตุผลก่อนส่ง");return;}
 
- const correct=codeIsCorrect(typed, current) && selectedReason===0;
+ const correct=codeIsCorrect(typed,current)&&selectedReason===0;
  if(!correct){
    $("fixFeedback").innerHTML='<div class="feedback no">โค้ดยังไม่ถูกต้อง ลองตรวจจุดที่แก้และเหตุผลอีกครั้ง</div>';
    return;
  }
+
+ levelSubmitting=true;
+ $("submitBtn").disabled=true;
  score+=10;
  $("score").textContent=score;
  $("fixFeedback").innerHTML='<div class="feedback ok">สุดยอด! ผ่านด่าน +10 คะแนน</div>';
+
  setTimeout(()=>{
    current++;
    if(current<levels.length)loadLevel();
    else finishGame();
  },700);
 }
-
 function finishGame(){
  localStorage.setItem("debugScore",String(score));
  localStorage.setItem("debugBadge","นักล่าบั๊ก");
