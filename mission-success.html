@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ภารกิจสำเร็จ! | Coding AI Lab</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Thai",sans-serif;background:linear-gradient(135deg,#eef7ff,#fff4fa);color:#26324a}
+.wrap{max-width:900px;margin:auto;padding:24px}
+.card{background:#fff;border-radius:28px;padding:28px;text-align:center;box-shadow:0 10px 35px rgba(60,80,120,.13)}
+.hero{width:100%;max-height:390px;object-fit:cover;border-radius:22px}
+h1{font-size:38px;margin:20px 0 8px}
+.score{font-size:28px;font-weight:800;margin:14px 0}
+.badge{display:inline-block;padding:12px 20px;border-radius:999px;background:#fff0a8;border:2px solid #efd05b;font-weight:800;font-size:18px}
+p{font-size:17px}
+button{border:0;border-radius:14px;padding:14px 22px;margin:7px;font-size:16px;font-weight:700;cursor:pointer}
+.primary{background:#718cff;color:#fff}.secondary{background:#edf1f7;color:#34405a}
+.note{color:#7b8495;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<img class="hero" src="mission-success.png" alt="Coding AI Lab mission success">
+<div style="font-size:60px">🏆</div>
+<h1>ภารกิจสำเร็จ!</h1>
+<p>เก่งมาก! คุณผ่านภารกิจ <strong>Debug Detective</strong> ครบ 5 ด่าน</p>
+<div class="score">คะแนน <span id="score">0</span>/100</div>
+<div class="badge">Badge: นักล่าบั๊ก</div>
+<p>คุณสังเกต คิดวิเคราะห์ และแก้ปัญหาโค้ดได้สำเร็จ</p>
+<div>
+<button class="primary" onclick="nextMission()">ไปภารกิจถัดไป</button>
+<button class="secondary" onclick="backLab()">กลับ Coding AI Lab</button>
+</div>
+<p class="note">หน้านี้รับคะแนนจาก Debug Detective อัตโนมัติ</p>
+</div>
+</div>
+<script>
+const params=new URLSearchParams(location.search);
+const score=params.get("score")||localStorage.getItem("debugScore")||"100";
+document.getElementById("score").textContent=score;
+function nextMission(){
+  // เปลี่ยน URL ตรงนี้เป็นกิจกรรมถัดไปเมื่อสร้างเสร็จ
+  location.href="exit-ticket.html";
+}
+function backLab(){
+  // เปลี่ยน URL ตรงนี้เป็นหน้า Coding AI Lab หลัก
+  history.back();
+}
+</script>
+</body>
+</html>
