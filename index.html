@@ -86,6 +86,7 @@ textarea{font-family:Consolas,monospace;line-height:1.6}
   <div class="score"><span id="final"></span>/100 คะแนน</div>
   <p><span class="pill">Badge: นักล่าบั๊ก</span></p>
   <button class="primary" onclick="saveResult()">บันทึกผลการทำกิจกรรม</button>
+  <button class="primary" onclick="openSuccess()">ดูหน้าภารกิจสำเร็จ!</button>
   <button class="secondary" onclick="location.reload()">ทำกิจกรรมใหม่</button>
   <div id="savefb"></div>
   <p class="note">ผลการทำกิจกรรมจะถูกส่งไปยัง Google Sheets เมื่อเชื่อม Google Apps Script แล้ว</p>
@@ -192,7 +193,17 @@ function submitLevel(){
  setTimeout(()=>{level++;level<5?loadLevel():finish()},700);
 }
 function finish(){
- $("game").classList.add("hide");$("success").classList.remove("hide");$("final").textContent=score;
+ localStorage.setItem("debugScore", score);
+ localStorage.setItem("debugBadge", "นักล่าบั๊ก");
+ localStorage.setItem("debugCompletedLevels", "5");
+ $("game").classList.add("hide");
+ $("success").classList.remove("hide");
+ $("final").textContent=score;
+}
+function openSuccess(){
+  localStorage.setItem("debugScore", score);
+  localStorage.setItem("debugBadge", "นักล่าบั๊ก");
+  location.href="mission-success.html?score="+encodeURIComponent(score);
 }
 function saveResult(){
  if(SHEET_URL.startsWith("ใส่_")){
