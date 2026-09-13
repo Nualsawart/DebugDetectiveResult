@@ -1,31 +1,215 @@
-<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Debug Detective</title>
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Debug Detective | Coding AI Lab</title>
 <style>
-body{font-family:Arial,sans-serif;margin:0;background:linear-gradient(135deg,#eef6ff,#fff5fa);color:#26324a}.wrap{max-width:850px;margin:auto;padding:24px}.card{background:#fff;border-radius:22px;padding:24px;margin:18px 0;box-shadow:0 8px 28px #0001}h1{margin-top:0}.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.pill{padding:8px 14px;border-radius:20px;background:#fff0a8;font-weight:bold}.bar{height:10px;background:#e7ebf2;border-radius:10px;overflow:hidden;margin:16px 0}.fill{height:100%;width:0;background:#718cff;transition:.3s}.code,textarea{width:100%;box-sizing:border-box;border-radius:14px;padding:16px;font:15px Consolas,monospace}.code{background:#172033;color:#fff;white-space:pre-wrap}.choice{display:block;width:100%;text-align:left;padding:13px;margin:7px 0;border:2px solid #e2e7ef;border-radius:12px;background:#fff;cursor:pointer}.choice.sel{border-color:#718cff;background:#eef2ff}button{border:0;border-radius:12px;padding:12px 18px;font-weight:bold;cursor:pointer}.primary{background:#718cff;color:#fff}.secondary{background:#edf0f6}.ok,.no{padding:12px;border-radius:12px;margin-top:12px}.ok{background:#e9f8ef;color:#21703c}.no{background:#fff0f0;color:#a33}.score{font-size:20px;font-weight:bold}.hide{display:none}.center{text-align:center}.badge{font-size:56px}
-input{width:100%;padding:12px;box-sizing:border-box;border:2px solid #e2e7ef;border-radius:11px;margin:5px 0 12px;font-size:16px}
-</style></head><body><div class="wrap">
-<div class="card" id="start"><div class="top"><div><h1>นักสืบโค้ด: Debug Detective</h1><p>ตามล่าบั๊กให้ครบ 5 ด่าน</p></div><span class="pill">Coding AI Lab</span></div>
-<label>ชื่อ–นามสกุล</label><input id="name"><label>เลขที่</label><input id="no"><button class="primary" onclick="start()">เริ่มภารกิจ</button></div>
-<div class="card hide" id="game"><div class="top"><b id="title"></b><span class="score">คะแนน <span id="score">0</span>/100</span></div><div class="bar"><div class="fill" id="fill"></div></div><p id="story"></p><h3>1. จุดที่ผิดอยู่ตรงไหน?</h3><div id="lines"></div><button class="primary" onclick="checkBug()">ตรวจคำตอบ</button><div id="fb"></div><div id="fix" class="hide"><h3>2. แก้โค้ด</h3><textarea id="answer" rows="5"></textarea><h3>3. ทำไมจึงผิด?</h3><div id="reasons"></div><button class="primary" onclick="submitLevel()">ส่งภารกิจด่านนี้</button><div id="fb2"></div></div></div>
-<div class="card hide center" id="success"><div class="badge">🏆</div><h1>ภารกิจสำเร็จ!</h1><p>เก่งมาก! ผ่านครบ 5 ด่าน</p><div class="score"><span id="final"></span>/100 คะแนน</div><p><span class="pill">Badge: นักล่าบั๊ก</span></p><button class="primary" onclick="save()">บันทึกผลการทำกิจกรรม</button><button class="secondary" onclick="location.reload()">ทำใหม่</button><div id="savefb"></div></div>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Thai",sans-serif;color:#26324a;
+background:linear-gradient(135deg,#eef7ff,#fff5fb)}
+.wrap{max-width:980px;margin:auto;padding:22px}
+.card{background:#fff;border-radius:26px;padding:26px;margin:18px 0;
+box-shadow:0 10px 35px rgba(70,90,130,.12)}
+.hero-img{width:100%;max-height:330px;object-fit:cover;border-radius:20px;display:block;margin-bottom:20px}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+h1{margin:0 0 8px;font-size:32px}.sub{color:#69758a}
+.pill{padding:8px 14px;border-radius:999px;background:#fff0a8;font-weight:700}
+.bar{height:11px;background:#e8edf5;border-radius:20px;overflow:hidden;margin:16px 0}
+.fill{height:100%;width:0;background:#718cff;transition:.35s}
+.code{background:#172033;color:#f2f6ff;padding:18px;border-radius:16px;
+font:15px/1.8 Consolas,monospace;white-space:pre-wrap}
+.choice{display:block;width:100%;text-align:left;padding:14px;margin:8px 0;
+border:2px solid #e1e7f0;border-radius:14px;background:#fff;cursor:pointer;font-size:15px}
+.choice:hover,.choice.sel{border-color:#718cff;background:#eef2ff}
+button{border:0;border-radius:14px;padding:13px 20px;font-weight:700;font-size:16px;cursor:pointer}
+.primary{background:#718cff;color:#fff}.secondary{background:#edf1f7;color:#34405a}
+input,textarea{width:100%;padding:13px;border:2px solid #e1e7f0;border-radius:13px;
+font-size:16px;margin:6px 0 13px}
+textarea{font-family:Consolas,monospace;line-height:1.6}
+.feedback{padding:13px;border-radius:13px;margin-top:12px;font-weight:700}
+.ok{background:#e9f8ef;color:#22723f}.no{background:#fff0f0;color:#a33}
+.score{font-size:20px;font-weight:700}.hide{display:none}.center{text-align:center}
+.trophy{font-size:70px}.note{color:#748096;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="card" id="start">
+  <img class="hero-img" src="mission-success.png" alt="Coding AI Lab cats celebrating">
+  <div class="top">
+    <div>
+      <h1>นักสืบโค้ด: Debug Detective</h1>
+      <div class="sub">ตามล่าบั๊กให้ครบ 5 ด่าน</div>
+    </div>
+    <span class="pill">Coding AI Lab</span>
+  </div>
+  <p>สังเกต → คิดวิเคราะห์ → แก้ไข → เรียนรู้ไปด้วยกัน</p>
+  <label>ชื่อ–นามสกุล</label>
+  <input id="name" placeholder="กรอกชื่อ–นามสกุล">
+  <label>เลขที่</label>
+  <input id="no" placeholder="เช่น 12">
+  <button class="primary" onclick="startGame()">เริ่มภารกิจ</button>
+</section>
+
+<section class="card hide" id="game">
+  <div class="top">
+    <b id="title"></b>
+    <span class="score">คะแนน <span id="score">0</span>/100</span>
+  </div>
+  <div class="bar"><div class="fill" id="fill"></div></div>
+  <p id="story"></p>
+
+  <h3>1. นักสืบพบจุดผิดตรงไหน?</h3>
+  <div id="lines"></div>
+  <button class="primary" onclick="checkBug()">ตรวจคำตอบ</button>
+  <div id="fb"></div>
+
+  <div id="fix" class="hide">
+    <h3>2. แก้โค้ดให้ถูกต้อง</h3>
+    <textarea id="answer" rows="6"></textarea>
+
+    <h3>3. ทำไมโค้ดจึงผิด?</h3>
+    <div id="reasons"></div>
+    <button class="primary" onclick="submitLevel()">ส่งภารกิจด่านนี้</button>
+    <div id="fb2"></div>
+  </div>
+</section>
+
+<section class="card hide center" id="success">
+  <img class="hero-img" src="mission-success.png" alt="Mission success">
+  <div class="trophy">🏆</div>
+  <h1>ภารกิจสำเร็จ!</h1>
+  <p>เก่งมาก! คุณผ่าน Debug Detective ครบ 5 ด่าน</p>
+  <div class="score"><span id="final"></span>/100 คะแนน</div>
+  <p><span class="pill">Badge: นักล่าบั๊ก</span></p>
+  <button class="primary" onclick="saveResult()">บันทึกผลการทำกิจกรรม</button>
+  <button class="secondary" onclick="location.reload()">ทำกิจกรรมใหม่</button>
+  <div id="savefb"></div>
+  <p class="note">ผลการทำกิจกรรมจะถูกส่งไปยัง Google Sheets เมื่อเชื่อม Google Apps Script แล้ว</p>
+</section>
+
 </div>
+
 <script>
-const SHEET_URL="ใส่_URL_GOOGLE_APPS_SCRIPT_ตรงนี้";
-const L=[
-["ด่าน 1 — ตัวแปรหายไปไหน?","ต้องการแสดงคะแนน แต่โปรแกรมเกิด Error.",["score = 20","print("คะแนน =", scores)"],1,["ใช้ชื่อตัวแปรไม่ตรงกัน","print ใช้ไม่ได้กับตัวเลข","ต้องใส่เครื่องหมาย + เสมอ"],'score = 20\nprint("คะแนน =", score)'],
-["ด่าน 2 — รับข้อมูลแล้วคำนวณ","รับอายุแล้วนำไปบวก แต่เกิดปัญหา.",["age = input("อายุ: ")","next_age = age + 1","print(next_age)"],0,["input() ได้ข้อความ จึงต้องแปลงเป็น int","ตัวแปร age ใช้ไม่ได้","ต้องใช้ float เท่านั้น"],'age = int(input("อายุ: "))\nnext_age = age + 1\nprint(next_age)'],
-["ด่าน 3 — เงื่อนไขกลับด้าน","ตรวจว่าคะแนน 50 ขึ้นไปผ่านหรือไม่.",["score = 75","if score < 50:","    print("ผ่าน")","else:","    print("ไม่ผ่าน")"],1,["เงื่อนไขต้องเป็น >= 50","if ห้ามใช้เครื่องหมายเปรียบเทียบ","else ต้องเขียนก่อน if"],'score = 75\nif score >= 50:\n    print("ผ่าน")\nelse:\n    print("ไม่ผ่าน")'],
-["ด่าน 4 — ลูปทำงานกี่รอบ?","ต้องแสดงเลข 1 ถึง 5.",["for i in range(1, 5):","    print(i)"],0,["range(1, 5) หยุดก่อนเลข 5","print ใช้ใน for ไม่ได้","ต้องเริ่มที่ 0 เสมอ"],'for i in range(1, 6):\n    print(i)'],
-["ด่าน 5 — นักสืบตัวจริง","คำนวณพื้นที่สี่เหลี่ยมผืนผ้า.",["width = 8","height = 5","area = width + height","print("พื้นที่ =", area)"],2,["พื้นที่ต้องคูณกว้าง × สูง","height ต้องเป็นข้อความ","print ต้องอยู่ก่อนการคำนวณ"],'width = 8\nheight = 5\narea = width * height\nprint("พื้นที่ =", area)']
+// ใส่ Web App URL ของ Google Apps Script ที่เชื่อมกับ Google Sheet ใหม่ของเรา
+const SHEET_URL = "ใส่_URL_GOOGLE_APPS_SCRIPT_ตรงนี้";
+
+const levels=[
+{
+title:"ด่าน 1 — ตัวแปรหายไปไหน?",
+story:"น้องแมวต้องการแสดงคะแนน แต่โปรแกรมเกิด Error",
+lines:["score = 20","print(\"คะแนน =\", scores)"],bug:1,
+reasons:["ใช้ชื่อตัวแปรไม่ตรงกัน","print ใช้ไม่ได้กับตัวเลข","ต้องใส่เครื่องหมาย + เสมอ"],
+answer:"score = 20\nprint(\"คะแนน =\", score)"
+},
+{
+title:"ด่าน 2 — รับข้อมูลแล้วคำนวณ",
+story:"รับอายุจากผู้ใช้ แล้วนำไปบวก 1 แต่เกิดปัญหา",
+lines:["age = input(\"อายุ: \")","next_age = age + 1","print(next_age)"],bug:0,
+reasons:["input() ได้ข้อความ จึงต้องแปลงเป็น int","ตัวแปร age ใช้ไม่ได้","ต้องใช้ float เท่านั้น"],
+answer:"age = int(input(\"อายุ: \"))\nnext_age = age + 1\nprint(next_age)"
+},
+{
+title:"ด่าน 3 — เงื่อนไขกลับด้าน",
+story:"ต้องการตรวจว่าคะแนน 50 ขึ้นไปผ่านหรือไม่",
+lines:["score = 75","if score < 50:","    print(\"ผ่าน\")","else:","    print(\"ไม่ผ่าน\")"],bug:1,
+reasons:["เงื่อนไขต้องเป็น >= 50","if ห้ามใช้เครื่องหมายเปรียบเทียบ","else ต้องเขียนก่อน if"],
+answer:"score = 75\nif score >= 50:\n    print(\"ผ่าน\")\nelse:\n    print(\"ไม่ผ่าน\")"
+},
+{
+title:"ด่าน 4 — ลูปทำงานกี่รอบ?",
+story:"ต้องการแสดงเลข 1 ถึง 5 แต่เลข 5 หายไป",
+lines:["for i in range(1, 5):","    print(i)"],bug:0,
+reasons:["range(1, 5) หยุดก่อนเลข 5","print ใช้ใน for ไม่ได้","ต้องเริ่มที่ 0 เสมอ"],
+answer:"for i in range(1, 6):\n    print(i)"
+},
+{
+title:"ด่าน 5 — นักสืบตัวจริง",
+story:"ต้องการคำนวณพื้นที่สี่เหลี่ยมผืนผ้า แต่ผลลัพธ์ไม่ถูกต้อง",
+lines:["width = 8","height = 5","area = width + height","print(\"พื้นที่ =\", area)"],bug:2,
+reasons:["พื้นที่ต้องคูณกว้าง × สูง","height ต้องเป็นข้อความ","print ต้องอยู่ก่อนการคำนวณ"],
+answer:"width = 8\nheight = 5\narea = width * height\nprint(\"พื้นที่ =\", area)"
+}
 ];
-let n=0,score=0,bug=false,reason=-1;
-const $=x=>document.getElementById(x);
-function start(){if(!$("name").value.trim()||!$("no").value.trim())return alert("กรุณากรอกชื่อและเลขที่");$("start").classList.add("hide");$("game").classList.remove("hide");load()}
-function load(){let x=L[n];$("title").textContent=x[0];$("story").textContent=x[1];$("score").textContent=score;$("fill").style.width=n/5*100+"%";$("lines").innerHTML=x[2].map((v,i)=>`<button class="choice" onclick="pick(this,${i})">บรรทัด ${i+1}: ${v.replaceAll("<","&lt;")}</button>`).join("");$("reasons").innerHTML=x[4].map((v,i)=>`<button class="choice" onclick="pickReason(this,${i})">${v}</button>`).join("");$("answer").value=x[5];$("fix").classList.add("hide");$("fb").innerHTML="";$("fb2").innerHTML="";bug=false}
-function pick(el,i){document.querySelectorAll("#lines .choice").forEach(x=>x.classList.remove("sel"));el.classList.add("sel");el.dataset.i=i}
-function pickReason(el,i){document.querySelectorAll("#reasons .choice").forEach(x=>x.classList.remove("sel"));el.classList.add("sel");reason=i}
-function checkBug(){let e=document.querySelector("#lines .sel");if(!e)return alert("เลือกบรรทัดก่อน");if(+e.dataset.i===L[n][3]){$("fb").innerHTML='<div class="ok">ถูกต้อง! เจอบั๊กแล้ว +10</div>';score+=10;$("score").textContent=score;$("fix").classList.remove("hide");bug=true}else $("fb").innerHTML='<div class="no">ยังไม่ใช่ ลองอ่านทีละบรรทัด</div>'}
-function submitLevel(){if(!bug)return;let ok=reason===0&&norm($("answer").value)===norm(L[n][5]);if(ok){score+=10;$("score").textContent=score;$("fb2").innerHTML='<div class="ok">สุดยอด! +10 คะแนน</div>';setTimeout(()=>{n++;n<5?load():finish()},700)}else $("fb2").innerHTML='<div class="no">ยังไม่ถูกทั้งหมด ลองตรวจโค้ดและเหตุผลอีกครั้ง</div>'}
+
+let level=0,score=0,bugFound=false,reason=-1;
+const $=id=>document.getElementById(id);
+
+function startGame(){
+ if(!$("name").value.trim()||!$("no").value.trim()){
+   alert("กรุณากรอกชื่อและเลขที่ก่อนเริ่มภารกิจ");return;
+ }
+ $("start").classList.add("hide");
+ $("game").classList.remove("hide");
+ loadLevel();
+}
+function loadLevel(){
+ const l=levels[level];
+ $("title").textContent=l.title;
+ $("story").textContent=l.story;
+ $("score").textContent=score;
+ $("fill").style.width=(level/5*100)+"%";
+ $("lines").innerHTML=l.lines.map((x,i)=>
+   `<button class="choice" data-i="${i}" onclick="pickBug(this,${i})">บรรทัด ${i+1}: ${esc(x)}</button>`
+ ).join("");
+ $("reasons").innerHTML=l.reasons.map((x,i)=>
+   `<button class="choice" data-r="${i}" onclick="pickReason(this,${i})">${esc(x)}</button>`
+ ).join("");
+ $("answer").value=l.answer;
+ $("fix").classList.add("hide");$("fb").innerHTML="";$("fb2").innerHTML="";
+ bugFound=false;reason=-1;
+}
+function pickBug(el,i){
+ document.querySelectorAll("#lines .choice").forEach(x=>x.classList.remove("sel"));
+ el.classList.add("sel");
+}
+function pickReason(el,i){
+ document.querySelectorAll("#reasons .choice").forEach(x=>x.classList.remove("sel"));
+ el.classList.add("sel");reason=i;
+}
+function checkBug(){
+ const el=document.querySelector("#lines .sel");
+ if(!el)return alert("เลือกบรรทัดที่คิดว่าผิดก่อน");
+ if(+el.dataset.i===levels[level].bug){
+   bugFound=true;score+=10;$("score").textContent=score;
+   $("fb").innerHTML='<div class="feedback ok">ถูกต้อง! เจอบั๊กแล้ว +10 คะแนน</div>';
+   $("fix").classList.remove("hide");
+ }else $("fb").innerHTML='<div class="feedback no">ยังไม่ใช่ ลองอ่านโค้ดทีละบรรทัดอีกครั้ง</div>';
+}
+function submitLevel(){
+ if(!bugFound)return;
+ if(reason<0)return alert("เลือกเหตุผลก่อนส่ง");
+ const ok=reason===0&&norm($("answer").value)===norm(levels[level].answer);
+ if(!ok){$("fb2").innerHTML='<div class="feedback no">ยังไม่ถูกทั้งหมด ลองตรวจโค้ดและเหตุผลอีกครั้ง</div>';return}
+ score+=10;$("score").textContent=score;
+ $("fb2").innerHTML='<div class="feedback ok">สุดยอด! ผ่านด่าน +10 คะแนน</div>';
+ setTimeout(()=>{level++;level<5?loadLevel():finish()},700);
+}
+function finish(){
+ $("game").classList.add("hide");$("success").classList.remove("hide");$("final").textContent=score;
+}
+function saveResult(){
+ if(SHEET_URL.startsWith("ใส่_")){
+   $("savefb").innerHTML='<div class="feedback no">ยังไม่ได้ใส่ URL Google Apps Script</div>';return;
+ }
+ const data={
+   studentName:$("name").value.trim(),
+   studentNumber:$("no").value.trim(),
+   activity:"Debug Detective",
+   score:score,
+   completedLevels:5,
+   badge:"นักล่าบั๊ก",
+   completedAt:new Date().toISOString()
+ };
+ fetch(SHEET_URL,{method:"POST",mode:"no-cors",
+   headers:{"Content-Type":"application/json"},body:JSON.stringify(data)})
+ .then(()=>{$("savefb").innerHTML='<div class="feedback ok">บันทึกผลเรียบร้อยแล้ว</div>'})
+ .catch(()=>{$("savefb").innerHTML='<div class="feedback no">บันทึกไม่สำเร็จ กรุณาตรวจ URL</div>'});
+}
 function norm(s){return s.replace(/\r/g,"").replace(/[ \t]+/g," ").trim()}
-function finish(){$("game").classList.add("hide");$("success").classList.remove("hide");$("final").textContent=score}
-function save(){if(SHEET_URL.startsWith("ใส่_"))return $("savefb").innerHTML='<div class="no">ใส่ URL Google Apps Script ก่อน</div>';let d={studentName:$("name").value.trim(),studentNumber:$("no").value.trim(),activity:"Debug Detective",score,completedLevels:5,badge:"นักล่าบั๊ก",completedAt:new Date().toISOString()};fetch(SHEET_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}).then(()=>$("savefb").innerHTML='<div class="ok">ส่งข้อมูลเรียบร้อย</div>').catch(()=>$("savefb").innerHTML='<div class="no">ส่งข้อมูลไม่สำเร็จ</div>')}
-</script></body></html>
+function esc(s){return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")}
+</script>
+</body>
+</html>
