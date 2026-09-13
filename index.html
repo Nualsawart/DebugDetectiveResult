@@ -24,7 +24,7 @@ border:2px solid #e1e7f0;border-radius:14px;background:#fff;cursor:pointer;font-
 .choice:hover,.choice.sel{border-color:#718cff;background:#eef2ff}
 button{border:0;border-radius:14px;padding:13px 20px;font-weight:700;font-size:16px;cursor:pointer}
 .primary{background:#718cff;color:#fff}.secondary{background:#edf1f7;color:#34405a}
-input,textarea{width:100%;padding:13px;border:2px solid #e1e7f0;border-radius:13px;
+input,textarea,select{width:100%;padding:13px;border:2px solid #e1e7f0;border-radius:13px;
 font-size:16px;margin:6px 0 13px}
 textarea{font-family:Consolas,monospace;line-height:1.6}
 .feedback{padding:13px;border-radius:13px;margin-top:12px;font-weight:700}
@@ -140,7 +140,7 @@ let level=0,score=0,bugFound=false,reason=-1;
 const $=id=>document.getElementById(id);
 
 function startGame(){
- if(!$("name").value.trim()||!$("no").value.trim()){
+ if(!$("name").value.trim()||!$("no").value.trim()||!$("classRoom").value){
    alert("กรุณากรอกชื่อและเลขที่ก่อนเริ่มภารกิจ");return;
  }
  $("start").classList.add("hide");
@@ -211,7 +211,7 @@ function saveResult(){
  }
  const data={
    studentName:$("name").value.trim(),
-   studentNumber:$("no").value.trim(),
+   studentNumber:$("no").value.trim(),classRoom:$("classRoom").value,
    activity:"Debug Detective",
    score:score,
    completedLevels:5,
