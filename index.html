@@ -68,7 +68,8 @@ textarea{font-family:Consolas,monospace;line-height:1.6}
 
   <div id="fix" class="hide">
     <h3>2. แก้โค้ดให้ถูกต้อง</h3>
-    <textarea id="answer" rows="6"></textarea>
+    <textarea id="answer" rows="6" placeholder="พิมพ์โค้ดที่แก้แล้วที่นี่..."></textarea>
+<p class="note">แก้โค้ดด้วยตัวเอง แล้วค่อยกด “ส่งภารกิจด่านนี้”</p>
 
     <h3>3. ทำไมโค้ดจึงผิด?</h3>
     <div id="reasons"></div>
@@ -157,7 +158,8 @@ function loadLevel(){
  $("reasons").innerHTML=l.reasons.map((x,i)=>
    `<button class="choice" data-r="${i}" onclick="pickReason(this,${i})">${esc(x)}</button>`
  ).join("");
- $("answer").value=l.answer;
+ $("answer").value="";
+$("answer").placeholder="พิมพ์โค้ดที่แก้แล้วที่นี่...";
  $("fix").classList.add("hide");$("fb").innerHTML="";$("fb2").innerHTML="";
  bugFound=false;reason=-1;
 }
@@ -181,7 +183,9 @@ function checkBug(){
 function submitLevel(){
  if(!bugFound)return;
  if(reason<0)return alert("เลือกเหตุผลก่อนส่ง");
- const ok=reason===0&&norm($("answer").value)===norm(levels[level].answer);
+ const typed=$("answer").value.trim();
+ if(!typed){$("fb2").innerHTML='<div class="feedback no">ลองแก้โค้ดก่อน แล้วจึงส่งคำตอบ</div>';return}
+ const ok=reason===0&&norm(typed)===norm(levels[level].answer);
  if(!ok){$("fb2").innerHTML='<div class="feedback no">ยังไม่ถูกทั้งหมด ลองตรวจโค้ดและเหตุผลอีกครั้ง</div>';return}
  score+=10;$("score").textContent=score;
  $("fb2").innerHTML='<div class="feedback ok">สุดยอด! ผ่านด่าน +10 คะแนน</div>';
