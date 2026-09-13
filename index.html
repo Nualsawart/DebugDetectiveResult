@@ -71,7 +71,7 @@ button{border:0;border-radius:14px;padding:13px 20px;font-size:16px;font-weight:
 
     <h3>3. ทำไมโค้ดจึงผิด?</h3>
     <div id="reasonChoices"></div>
-    <button class="primary" id="submitBtn">ส่งภารกิจด่านนี้</button>
+    <button class="primary" id="submitBtn">ตรวจโค้ดและไปต่อ</button>
     <div id="fixFeedback"></div>
   </div>
 </section>
@@ -215,9 +215,9 @@ function submitLevel(){
  if(!typed){$("fixFeedback").innerHTML='<div class="feedback no">ลองแก้โค้ดก่อน แล้วจึงส่งคำตอบ</div>';return;}
  if(selectedReason<0){alert("เลือกเหตุผลก่อนส่ง");return;}
 
- const correct=normalize(typed)===normalize(levels[current].answer)&&selectedReason===0;
+ const correct=codeIsCorrect(typed, current) && selectedReason===0;
  if(!correct){
-   $("fixFeedback").innerHTML='<div class="feedback no">ยังไม่ถูกทั้งหมด ลองตรวจโค้ดและเหตุผลอีกครั้ง</div>';
+   $("fixFeedback").innerHTML='<div class="feedback no">โค้ดยังไม่ถูกต้อง ลองตรวจจุดที่แก้และเหตุผลอีกครั้ง</div>';
    return;
  }
  score+=10;
@@ -259,6 +259,34 @@ function saveResult(){
  }).catch(()=>{
    $("saveFeedback").innerHTML='<div class="feedback no">ส่งข้อมูลไม่สำเร็จ กรุณาตรวจ Apps Script</div>';
  });
+}
+
+function codeIsCorrect(typed, i){
+  const c=typed.replace(/\r/g,"").trim();
+  if(!c) return false;
+
+  // Ignore accidental line labels such as "บรรทัด 2:" if pasted into the editor.
+  const x=c.replace(/บรรทัด\s*\d+\s*:/g,"").replace(/^\s*\d+\s*:\s*/gm,"").trim();
+
+  if(i===0)
+    return /\bscore\s*=\s*20\b/.test(x) && /print\s*\(\s*["']คะแนน\s*=\s*["']\s*,\s*score\s*\)/.test(x) && !/\bscores\b/.test(x);
+  if(i===1)
+    return /age\s*=\s*int\s*\(\s*input\s*\(\s*["']อายุ:\s*["']\s*\)\s*\)/.test(x)
+      && /next_age\s*=\s*age\s*\+\s*1/.test(x) && /print\s*\(\s*next_age\s*\)/.test(x);
+  if(i===2)
+    return /if\s+score\s*>=\s*50\s*:/.test(x)
+      && /print\s*\(\s*["']ผ่าน["']\s*\)/.test(x)
+      && /else\s*:/.test(x)
+      && /print\s*\(\s*["']ไม่ผ่าน["']\s*\)/.test(x);
+  if(i===3)
+    return /for\s+i\s+in\s+range\s*\(\s*1\s*,\s*6\s*\)\s*:/.test(x)
+      && /print\s*\(\s*i\s*\)/.test(x);
+  if(i===4)
+    return /width\s*=\s*8/.test(x)
+      && /height\s*=\s*5/.test(x)
+      && /area\s*=\s*width\s*\*\s*height/.test(x)
+      && /print\s*\(\s*["']พื้นที่\s*=\s*["']\s*,\s*area\s*\)/.test(x);
+  return false;
 }
 
 function normalize(s){
